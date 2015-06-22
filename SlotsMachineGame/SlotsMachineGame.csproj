@@ -73,7 +73,9 @@
     <Content Include="assets\images\cherry slot.png" />
     <Content Include="assets\images\logo.PNG" />
     <Content Include="assets\images\mango slot.png" />
+    <Content Include="assets\images\reset button.png" />
     <Content Include="assets\images\slot_machine.png" />
+    <Content Include="assets\images\spin button.png" />
     <Content Include="css\main.css" />
     <Content Include="index.html" />
     <Content Include="Scripts\jquery.js" />
