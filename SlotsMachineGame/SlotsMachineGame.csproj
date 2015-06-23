@@ -59,6 +59,11 @@
     <Reference Include="System.EnterpriseServices" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="assets\images\background.png" />
+    <Content Include="assets\images\disableSpinButton.png" />
+    <Content Include="assets\images\logo.PNG" />
+    <Content Include="assets\images\melon slot.png" />
+    <Content Include="assets\images\power.png" />
     <Content Include="packages.config" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
@@ -68,32 +73,31 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="assets\audio\spin.wav" />
     <Content Include="assets\images\banana slot.png" />
+    <Content Include="assets\images\bet1 button.png" />
+    <Content Include="assets\images\bet10 button.png" />
+    <Content Include="assets\images\betMax button.png" />
     <Content Include="assets\images\blank slot.png" />
     <Content Include="assets\images\cherry slot.png" />
-    <Content Include="assets\images\logo.PNG" />
-    <Content Include="assets\images\mango slot.png" />
     <Content Include="assets\images\reset button.png" />
     <Content Include="assets\images\slot_machine.png" />
     <Content Include="assets\images\spin button.png" />
     <Content Include="css\main.css" />
     <Content Include="index.html" />
-    <Content Include="Scripts\jquery.js" />
     <Content Include="Scripts\lib\easeljs-0.8.0.min.js" />
     <Content Include="Scripts\lib\preloadjs-0.6.0.min.js" />
     <Content Include="Scripts\lib\soundjs-0.6.0.min.js" />
     <Content Include="Scripts\lib\tweenjs-0.6.0.min.js" />
-    <Content Include="Scripts\main.js" />
     <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="assets\audio\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <TypeScriptCompile Include="Scripts\game.ts" />
+    <TypeScriptCompile Include="Scripts\objects\button.ts" />
     <TypeScriptCompile Include="Scripts\typings\createjs-lib\createjs-lib.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\easeljs\easeljs.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\preloadjs\preloadjs.d.ts" />

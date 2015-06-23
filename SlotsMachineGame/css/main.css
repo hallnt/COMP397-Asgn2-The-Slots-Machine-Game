@@ -1,5 +1,19 @@
 ﻿body {
+    background-image: url('../assets/images/background.png');
+    background-repeat: repeat;
 }
+
 canvas {
     border: solid 1px #ffd800;
+}
+
+#header {
+	text-align: center;
+	color: white;
+}
+
+#wrapper {
+	width: 480px;
+	margin-left: auto;
+    margin-right: auto;
 }
