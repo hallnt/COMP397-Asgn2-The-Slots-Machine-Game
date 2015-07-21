@@ -1,57 +1,82 @@
+/*+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
++++ Source File: COMP397 Assignment 2 - Slot Machine Game                                                   +++
++++ Author: Teleisha Hall                                                                                   +++
++++ ID: 300820822                                                                                           +++
++++ Last Modified By: Teleisha Hall                                                                         +++
++++ Date Last Modified - July 20, 2015                                                                      +++
++++ Program Description: A slot machine game using the Createjs framework                                   +++
++++ Revision History: v5 - https://github.com/hallnt/COMP397-Asgn2-The-Slots-Machine-Game/commits/master    +++
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
+/// <reference path="typings/stats/stats.d.ts" />
 /// <reference path="typings/easeljs/easeljs.d.ts" />
 /// <reference path="typings/tweenjs/tweenjs.d.ts" />
 /// <reference path="typings/soundjs/soundjs.d.ts" />
 /// <reference path="typings/preloadjs/preloadjs.d.ts" />
 /// <reference path="objects/button.ts" />
+/// <reference path="objects/label.ts" />
+/// <reference path="objects/reel.ts" />
 ///////////////////////////////////////////////////////////////
 //                  GAME FRAMEWORK VARIABLES                 //
 ///////////////////////////////////////////////////////////////
 var canvas = document.getElementById("canvas");
 var stage;
+var stats;
 var assets;
 var manifest = [
     { id: "slotmachine", src: "assets/images/slot_machine.png" },
-    { id: "1", src: "assets/images/blank slot.png" },
-    { id: "2", src: "assets/images/banana slot.png" },
-    { id: "3", src: "assets/images/cherry slot.png" },
-    { id: "4", src: "assets/images/melon slot.png" },
+    { id: "blank", src: "assets/images/blank slot.png" },
+    { id: "banana", src: "assets/images/banana slot.png" },
+    { id: "cherry", src: "assets/images/cherry slot.png" },
+    { id: "melon", src: "assets/images/melon slot.png" },
+    { id: "jpot", src: "assets/images/jackpot slot.png" },
     { id: "spinButton", src: "assets/images/spin button.png" },
+    { id: "disabledSpinButton", src: "assets/images/disableSpin button.png" },
     { id: "resetButton", src: "assets/images/reset button.png" },
     { id: "bet1Button", src: "assets/images/bet1 button.png" },
     { id: "bet10Button", src: "assets/images/bet10 button.png" },
     { id: "betmaxButton", src: "assets/images/betMax button.png" },
     { id: "powerButton", src: "assets/images/power.png" },
-    { id: "spinSound", src: "assets/audio/spin.wav" }
+    { id: "spinSound", src: "assets/audio/spin.wav" },
+    { id: "winSound", src: "assets/audio/winSound.wav" },
+    { id: "jackpotSound", src: "assets/audio/JackpotSound.wav" }
 ];
 ///////////////////////////////////////////////////////////////
 //                       GAME VARIABLES                      //
 ///////////////////////////////////////////////////////////////
+// slot machine
 var slotmachine; //create a reference
+// buttons
 var spinButton;
+var disabledSpinButton;
 var resetButton;
 var bet1Button;
 var bet10Button;
 var betmaxButton;
 var powerButton;
+// labels
 var playerCreditLabel;
 var playerBetLabel;
 var jackpotLabel;
 var spinResultsLabel;
-var slot1;
-var slot2;
-var slot3;
+var winsLabel;
+var lossLabel;
+var turnsLabel;
+// reels
+var reel1;
+var reel2;
+var reel3;
+// score variables
 var increment = 0;
-var playerCredit = 1000; // credit amount player has
-var playerBet = 0; // bet amount
-var bet1 = 10; // 1*10
-var bet10 = 100; // 10*10
-var betMax = playerCredit; // all of player's credit
-var winRatio = 0;
-var winNumber = 0;
-var lossNumber = 0;
-var winnings = 0;
+var credit = 1000; // credit amount player has
+var betAmount = 0; // bet amount
+var bet1 = 1;
+var bet10 = 10;
 var jackpot = 5000;
-var turn = 0;
+var wins = 0;
+var losses = 0;
+var turns = 0;
+var spinResult;
+var result = " ";
 ///////////////////////////////////////////////////////////////
 //                     PRELOADER FUNCTION                    //
 ///////////////////////////////////////////////////////////////
@@ -61,6 +86,8 @@ function preload() {
     // event listener triggers when assets are completely loaded
     assets.on("complete", init, this);
     assets.loadManifest(manifest);
+    //Setup statistics object
+    setupStats();
 }
 ///////////////////////////////////////////////////////////////
 //     CALLBACK FUNCTION THAT INITIALIZES GAME OBJECTS       //
@@ -75,180 +102,218 @@ function init() {
     main();
 }
 ///////////////////////////////////////////////////////////////
+//              FUNCTION TO SETUP STAT COUNTING              //
+///////////////////////////////////////////////////////////////
+function setupStats() {
+    stats = new Stats();
+    stats.setMode(0); // set to fps
+    // align bottom-right
+    stats.domElement.style.position = 'absolute';
+    stats.domElement.style.left = '850px';
+    stats.domElement.style.top = '130px';
+    document.body.appendChild(stats.domElement);
+}
+///////////////////////////////////////////////////////////////
 //     CALLBACK FUNCTION THAT CREATES OUR MAIN GAME LOOP     //
 ///////////////////////////////////////////////////////////////
 function gameLoop() {
+    stats.begin(); // Begin measuring
     stage.update();
+    stats.end(); // end measuring
+}
+///////////////////////////////////////////////////////////////
+//              FUNCTION TO UPDATE GAME SCORES               //
+///////////////////////////////////////////////////////////////
+function updateScores() {
+    playerCreditLabel.text = credit.toString();
+    playerBetLabel.text = betAmount.toString();
+    winsLabel.text = wins.toString();
+    lossLabel.text = losses.toString();
+    turnsLabel.text = turns.toString();
+}
+///////////////////////////////////////////////////////////////
+//           FUNCTION TO SPIN SLOT MACHINE REELS             //
+///////////////////////////////////////////////////////////////
+function spin() {
+    var betLine = [" ", " ", " "];
+    var outcome = [0, 0, 0]; //store outcome values after 3 loops of random number generation
+    for (var spin = 0; spin < 3; spin++) {
+        outcome[spin] = Math.floor(Math.random() * 5) + 1; // generate a random number from 1 to 5
+        switch (outcome[spin]) {
+            case 1:
+                betLine[spin] = "blank";
+                increment++;
+                break;
+            case 2:
+                betLine[spin] = "banana";
+                increment++;
+                break;
+            case 3:
+                betLine[spin] = "cherry";
+                increment++;
+                break;
+            case 4:
+                betLine[spin] = "melon";
+                increment++;
+                break;
+            case 5:
+                betLine[spin] = "jpot";
+                increment++;
+                break;
+        }
+    }
+    return betLine; // return value of betLine outcome
+}
+///////////////////////////////////////////////////////////////
+//       FUNCTION TO CHECK IF PLAYER HAS ENOUGH CREDIT       //
+///////////////////////////////////////////////////////////////
+function hasEnoughCredit(betAmt) {
+    if (credit >= betAmt) {
+        return true;
+    }
+    return false;
+}
+///////////////////////////////////////////////////////////////
+//             FUNCTION TO DISPLAY SPIN RESULTS              //
+///////////////////////////////////////////////////////////////
+function displaySpinResults() {
+    stage.removeAllChildren; // wipe away existing results
+    spinResult = spin(); // store result of spin function in variable value
+    reel1 = new objects.Reel(assets.getResult(spinResult[0].toString()), 41, 152);
+    reel2 = new objects.Reel(assets.getResult(spinResult[1].toString()), 124, 152);
+    reel3 = new objects.Reel(assets.getResult(spinResult[2].toString()), 207, 152);
+    console.log(spinResult[0] + " " + spinResult[1] + " " + spinResult[2]);
+    // add images to reels based on outcome from Spin() function
+    stage.addChild(reel1);
+    stage.addChild(reel2);
+    stage.addChild(reel3);
+    // player wins if all 3 reels are equal but IS NOT the jackpot slot image nor the blank slot image
+    if (((spinResult[0] == spinResult[1]) && (spinResult[0] == spinResult[2])) && ((spinResult[1] != "jpot") && (spinResult[1] != "blank"))) {
+        createjs.Sound.play("winSound"); // play sound when player wins
+        credit = credit + (betAmount * 10);
+        wins++;
+        turns++;
+        betAmount = 0;
+        spinResultsLabel.text = "You Win!";
+        updateScores();
+    }
+    // player hits jackpot if all 3 reels are equal and IS the jackpot slot image
+    if (((spinResult[0] == spinResult[1]) && (spinResult[0] == spinResult[2])) && spinResult[1] == "jpot") {
+        createjs.Sound.play("jackpotSound"); // play sound when player wins
+        credit = credit + jackpot;
+        wins++;
+        turns++;
+        betAmount = 0;
+        spinResultsLabel.text = "JACKPOT!";
+        updateScores();
+    }
+    // player loses
+    if (spinResult[0] != spinResult[1]) {
+        losses++;
+        turns++;
+        betAmount = 0;
+        spinResultsLabel.text = "You Lose!";
+        updateScores();
+    }
+    if (((spinResult[0] == spinResult[1]) && (spinResult[0] == spinResult[2])) && spinResult[1] == "blank") {
+        losses++;
+        turns++;
+        betAmount = 0;
+        spinResultsLabel.text = "You Lose!";
+        updateScores();
+    }
 }
 ///////////////////////////////////////////////////////////////
 //CALLBACK FUNCTION THAT RESPONDS TO SPIN BUTTON CLICK EVENTS//
 ///////////////////////////////////////////////////////////////
 function spinButtonClicked(event) {
-    show(); // call show() method when spin button is clicked
-    createjs.Sound.play("spinSound"); // play sound when spin button is clicked
-    playerCreditLabel = new createjs.Text(playerCredit.toString(), "16px Consolas", "#0F0FFF");
-    playerCreditLabel.regX = playerCreditLabel.getMeasuredWidth() * 0.5;
-    playerCreditLabel.regY = playerCreditLabel.getMeasuredHeight() * 0.5;
-    playerCreditLabel.x = 91;
-    playerCreditLabel.y = 290;
-    stage.addChild(playerCreditLabel);
+    // check if user placed a bet
+    if (betAmount > 0) {
+        createjs.Sound.play("spinSound"); // play sound when spin button is clicked
+        displaySpinResults();
+    }
+    else {
+        spinResultsLabel.text = "Place Bet";
+    }
 }
 ///////////////////////////////////////////////////////////////
 //CALLBACK FUNCTION THAT RESPONDS TO RESETBUTTON CLICK EVENTS//
 ///////////////////////////////////////////////////////////////
 function resetButtonClicked(event) {
-    main(); // call show() method when spin button is clicked
+    if (confirm("Reset Game?")) {
+        credit = 1000;
+        betAmount = 0;
+        wins = 0;
+        losses = 0;
+        turns = 0;
+        spinResultsLabel.text = "Place Bet";
+        main();
+    }
 }
 ///////////////////////////////////////////////////////////////
 //CALLBACK FUNCTION THAT RESPONDS TO POWERBUTTON CLICK EVENTS//
 ///////////////////////////////////////////////////////////////
 function powerButtonClicked(event) {
     if (confirm("Quit Game?")) {
-        close(); // end game when power button is clicked    
+        window.close(); // end game when power button is clicked    
     }
 }
 ///////////////////////////////////////////////////////////////
 //CALLBACK FUNCTION THAT RESPONDS TO BET1 BUTTON CLICK EVENTS//
 ///////////////////////////////////////////////////////////////
 function bet1ButtonClicked(event) {
-    stage.removeAllChildren; // wipe away existing results
-    // show '10' in player bet label if bet1 button is clicked
-    playerBetLabel = new createjs.Text(bet1.toString(), "16px Consolas", "#0F0FFF");
-    playerBetLabel.regX = playerBetLabel.getMeasuredWidth() * 0.5;
-    playerBetLabel.regY = playerCreditLabel.getMeasuredHeight() * 0.5;
-    playerBetLabel.x = 91;
-    playerBetLabel.y = 340;
-    stage.addChild(playerBetLabel);
-    playerCredit = playerCredit - bet1; // subtract 10 from player's credit amount
-    playerCreditLabel = new createjs.Text(playerCredit.toString(), "16px Consolas", "#0F0FFF");
-    playerCreditLabel.regX = playerCreditLabel.getMeasuredWidth() * 0.5;
-    playerCreditLabel.regY = playerCreditLabel.getMeasuredHeight() * 0.5;
-    playerCreditLabel.x = 91;
-    playerCreditLabel.y = 290;
-    stage.addChild(playerCreditLabel);
+    if (hasEnoughCredit(1)) {
+        betAmount = bet1; // bet 1 credit
+        credit = credit - betAmount;
+        playerBetLabel.text = betAmount.toString();
+        playerCreditLabel.text = credit.toString();
+        spinResultsLabel.text = "Spin";
+    }
+    else {
+        spinResultsLabel.text = "Insufficient Credit"; // player does not have enough credit to place bet
+    }
 }
 ///////////////////////////////////////////////////////////////
 //CALLBACK FUNCTION THAT RESPONDS TO BET10BUTTON CLICK EVENTS//
 ///////////////////////////////////////////////////////////////
 function bet10ButtonClicked(event) {
-    stage.removeChild(playerBetLabel); // wipe away existing results
-    // show '100' in player bet label if bet10 button is clicked
-    playerBetLabel = new createjs.Text(bet10.toString(), "16px Consolas", "#0F0FFF");
-    playerBetLabel.regX = playerBetLabel.getMeasuredWidth() * 0.5;
-    playerBetLabel.regY = playerCreditLabel.getMeasuredHeight() * 0.5;
-    playerBetLabel.x = 91;
-    playerBetLabel.y = 340;
-    stage.addChild(playerBetLabel);
-    playerCredit = playerCredit - bet10; // subtract 100 from player's credit amount
-    playerCreditLabel = new createjs.Text(playerCredit.toString(), "16px Consolas", "#0F0FFF");
-    playerCreditLabel.regX = playerCreditLabel.getMeasuredWidth() * 0.5;
-    playerCreditLabel.regY = playerCreditLabel.getMeasuredHeight() * 0.5;
-    playerCreditLabel.x = 91;
-    playerCreditLabel.y = 290;
-    stage.addChild(playerCreditLabel);
+    if (hasEnoughCredit(10)) {
+        betAmount = bet10; // bet 10 credits
+        credit = credit - betAmount;
+        playerBetLabel.text = betAmount.toString();
+        playerCreditLabel.text = credit.toString();
+        spinResultsLabel.text = "Spin";
+    }
+    else {
+        spinResultsLabel.text = "Insufficient Credit"; // player does not have enough credit to place bet
+    }
 }
 ///////////////////////////////////////////////////////////////
 //CALLBACK FUNCTION THAT RESPOND TO BETMAX BUTTON CLICK EVENT//
 ///////////////////////////////////////////////////////////////
 function betmaxButtonClicked(event) {
-    stage.removeChild(playerBetLabel); // wipe away existing results
-    // show total player credit in player bet label if betmax button is clicked
-    playerBetLabel = new createjs.Text(betMax.toString(), "16px Consolas", "#0F0FFF");
-    playerBetLabel.regX = playerBetLabel.getMeasuredWidth() * 0.5;
-    playerBetLabel.regY = playerCreditLabel.getMeasuredHeight() * 0.5;
-    playerBetLabel.x = 91;
-    playerBetLabel.y = 340;
-    stage.addChild(playerBetLabel);
-    playerCredit = playerCredit - betMax; // subtract all of player's credit 
-    playerCreditLabel = new createjs.Text(playerCredit.toString(), "16px Consolas", "#0F0FFF");
-    playerCreditLabel.regX = playerCreditLabel.getMeasuredWidth() * 0.5;
-    playerCreditLabel.regY = playerCreditLabel.getMeasuredHeight() * 0.5;
-    playerCreditLabel.x = 91;
-    playerCreditLabel.y = 290;
-    stage.addChild(playerCreditLabel);
-}
-///////////////////////////////////////////////////////////////
-//               FUNCTION TO SPIN SLOT MACHINE               //
-///////////////////////////////////////////////////////////////
-function Spin() {
-    var slot = [" ", " ", " "]; //display images on slots
-    var outcome = [0, 0, 0]; //store outcome values after 3 loops of random number generation
-    for (var spin = 0; spin < 3; spin++) {
-        outcome[spin] = Math.floor(Math.random() * 4) + 1; // generate a random number from 1 to 4
-        switch (outcome[spin]) {
-            case 1:
-                slot[spin] = "1";
-                increment++;
-                break;
-            case 2:
-                slot[spin] = "2";
-                increment++;
-                break;
-            case 3:
-                slot[spin] = "3";
-                increment++;
-                break;
-            case 4:
-                slot[spin] = "4";
-                increment++;
-                break;
-        }
-    }
-    return slot; // return value of slot outcome
-    playerCredit = playerCredit - playerBet;
-}
-///////////////////////////////////////////////////////////////
-//              FUNCTION TO DISPLAY SLOT RESULTS             //
-///////////////////////////////////////////////////////////////
-function show() {
-    stage.removeAllChildren; // wipe away existing results
-    var value = Spin(); // store result of Spin() function in variable value
-    slot1 = new createjs.Bitmap(assets.getResult(value[0].toString())); // create slot1 object
-    slot1.regX = slot1.getBounds().width * 0.5; // find center of slot
-    slot1.regY = slot1.getBounds().height * 0.5; // find center of slot
-    slot1.x = 78;
-    slot1.y = 216;
-    slot2 = new createjs.Bitmap(assets.getResult(value[1].toString())); // create slot2 object
-    slot2.regX = slot2.getBounds().width * 0.5;
-    slot2.regY = slot2.getBounds().height * 0.5;
-    slot2.x = 161;
-    slot2.y = 216;
-    slot3 = new createjs.Bitmap(assets.getResult(value[2].toString())); // create slot3 object
-    slot3.regX = slot3.getBounds().width * 0.5;
-    slot3.regY = slot3.getBounds().height * 0.5;
-    slot3.x = 244;
-    slot3.y = 216;
-    console.log(value[0] + " " + value[1] + " " + value[2]);
-    // add images to slots based on outcome from Spin() function
-    stage.addChild(slot1);
-    stage.addChild(slot2);
-    stage.addChild(slot3);
+    betAmount = credit; // bet total remaining credit
+    credit = credit - betAmount;
+    playerBetLabel.text = betAmount.toString();
+    playerCreditLabel.text = credit.toString();
+    spinResultsLabel.text = "Spin";
 }
 ///////////////////////////////////////////////////////////////
 //                     MAIN GAME FUNCTION                    //
 ///////////////////////////////////////////////////////////////
 function main() {
     console.log("Game is Running");
+    // create and add slot machine to the stage
     slotmachine = new createjs.Bitmap(assets.getResult("slotmachine")); // create slotMachine object
     stage.addChild(slotmachine); //add slotMachine object to stage
-    slot1 = new createjs.Bitmap(assets.getResult("1")); // create new slot1 object
-    slot1.regX = slot1.getBounds().width * 0.5;
-    slot1.regY = slot1.getBounds().height * 0.5;
-    slot1.x = 78;
-    slot1.y = 216;
-    stage.addChild(slot1); // add blank slot to slot1 upon startup of game
-    slot2 = new createjs.Bitmap(assets.getResult("1")); // create new slot2 object
-    slot2.regX = slot2.getBounds().width * 0.5;
-    slot2.regY = slot2.getBounds().height * 0.5;
-    slot2.x = 161;
-    slot2.y = 216;
-    stage.addChild(slot2); // add blank slot to slot2 upon startup of game
-    slot3 = new createjs.Bitmap(assets.getResult("1")); // create new slot2 object
-    slot3.regX = slot3.getBounds().width * 0.5;
-    slot3.regY = slot3.getBounds().height * 0.5;
-    slot3.x = 244;
-    slot3.y = 216;
-    stage.addChild(slot3); // add blank to slot3 upon startup of game
+    // create and add reel objects to the stage
+    reel1 = new objects.Reel(assets.getResult("blank"), 41, 152);
+    stage.addChild(reel1); // add blank slot to reel1 upon startup of game
+    reel2 = new objects.Reel(assets.getResult("blank"), 124, 152);
+    stage.addChild(reel2); // add blank slot to reel2 upon startup of game
+    reel3 = new objects.Reel(assets.getResult("blank"), 207, 152);
+    stage.addChild(reel3); // add blank slot to reel3 upon startup of game
+    // create and add button objects to the stage
     spinButton = new objects.Button(assets.getResult("spinButton"), 244, 438); // create spinButton object
     stage.addChild(spinButton); // add spin button to stage
     spinButton.on("click", spinButtonClicked); // add mouse click event to spin button
@@ -267,29 +332,20 @@ function main() {
     powerButton = new objects.Button(assets.getResult("powerButton"), 285, 438); // create powerButton object
     stage.addChild(powerButton); // add power button to stage
     powerButton.on("click", powerButtonClicked); // add mouse click event to power button
-    playerCreditLabel = new createjs.Text(playerCredit.toString(), "16px Consolas", "#0F0FFF"); // create playerCreditLabel object
-    playerCreditLabel.regX = playerCreditLabel.getMeasuredWidth() * 0.5; // find center of label
-    playerCreditLabel.regY = playerCreditLabel.getMeasuredHeight() * 0.5; // find center of label
-    playerCreditLabel.x = 91;
-    playerCreditLabel.y = 290;
-    stage.addChild(playerCreditLabel); // add playerCreditLabel to stage
-    playerBetLabel = new createjs.Text(playerBet.toString(), "16px Consolas", "#0F0FFF"); // create playerBetLabel object
-    playerBetLabel.regX = playerBetLabel.getMeasuredWidth() * 0.5;
-    playerBetLabel.regY = playerCreditLabel.getMeasuredHeight() * 0.5;
-    playerBetLabel.x = 91;
-    playerBetLabel.y = 340;
-    stage.addChild(playerBetLabel); // add playerBetLabel to stage
-    jackpotLabel = new createjs.Text(jackpot.toString(), "22px Consolas", "#FF0000"); // create jackpotLabel object
-    jackpotLabel.regX = jackpotLabel.getMeasuredWidth() * 0.5;
-    jackpotLabel.regY = jackpotLabel.getMeasuredHeight() * 0.5;
-    jackpotLabel.x = 221;
-    jackpotLabel.y = 290;
-    stage.addChild(jackpotLabel); // add jackpotLabel to stage
-    spinResultsLabel = new createjs.Text("Spin", "20px Consolas", "#0000FF"); // create spinResultsLabel object
-    spinResultsLabel.regX = spinResultsLabel.getMeasuredWidth() * 0.5;
-    spinResultsLabel.regY = spinResultsLabel.getMeasuredHeight() * 0.5;
-    spinResultsLabel.x = 221;
-    spinResultsLabel.y = 336;
+    // create and add label objects to the stage
+    playerCreditLabel = new objects.Label(credit.toString(), 77, 269); // create playerCreditLabel object
+    stage.addChild(playerCreditLabel); // add playerCredit label to stage
+    playerBetLabel = new objects.Label(betAmount.toString(), 80, 311); // create playerBetLabel object
+    stage.addChild(playerBetLabel); // add playerBet ;abel to stage
+    jackpotLabel = new objects.Label(jackpot.toString(), 208, 264); // create jackpotLabel object
+    stage.addChild(jackpotLabel); // add jackpot label to stage
+    spinResultsLabel = new objects.Label("Place Bet", 180, 310); // create spinResultsLabel object
     stage.addChild(spinResultsLabel); // add spinResultsLabel to stage
+    winsLabel = new objects.Label(wins.toString(), 96, 347); // create winsLabel object
+    stage.addChild(winsLabel); // add wins label to stage
+    lossLabel = new objects.Label(losses.toString(), 176, 347); // create winsLabel object
+    stage.addChild(lossLabel); // add losses label to stage
+    turnsLabel = new objects.Label(turns.toString(), 242, 347); // create winsLabel object
+    stage.addChild(turnsLabel); // add turns label to stage
 }
 //# sourceMappingURL=game.js.map

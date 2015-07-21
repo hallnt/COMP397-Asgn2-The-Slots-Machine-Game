@@ -4,9 +4,9 @@
 <!-- Author: Teleisha Hall-->
 <!-- ID: 300820822 -->
 <!-- Last Modified By: Teleisha Hall -->
-<!-- Date Last Modified - June 21, 2015 -->
+<!-- Date Last Modified - July 20, 2015 -->
 <!-- Program Description: A slot machine game using the Createjs framework -->
-<!-- Version 4.0 -->
+<!-- Revision History: v5 - https://github.com/hallnt/COMP397-Asgn2-The-Slots-Machine-Game/commits/master -->
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />    
@@ -19,7 +19,8 @@
     <div id="header">
         <h1>
             <img src="assets/images/logo.PNG" />
-            Welcome to Super Slots! </ br>            
+            <br />
+            Welcome to Super Slots!
         </h1>
     </div>
 
@@ -28,6 +29,7 @@
         <canvas id="canvas" width="320" height="480"></canvas>
 
         <!-- JAVASCRIPT SECTION -->
+        <script src="Scripts/lib/Stats.js"></script>
         <script src="Scripts/lib/easeljs-0.8.0.min.js"></script>
         <script src="Scripts/lib/tweenjs-0.6.0.min.js"></script>
         <script src="Scripts/lib/soundjs-0.6.0.min.js"></script>
@@ -35,7 +37,13 @@
 
         <!-- GAME SCRIPTS -->
         <script src="Scripts/objects/button.js"></script>
+        <script src="Scripts/objects/label.js"></script>
+        <script src="Scripts/objects/reel.js"></script>
         <script src="Scripts/game.js"></script>
+    </div>
+
+    <div id="footer">
+        <b>Copyright &copy; TNH Web Solutions</b>
     </div>
 </body>
 </html>

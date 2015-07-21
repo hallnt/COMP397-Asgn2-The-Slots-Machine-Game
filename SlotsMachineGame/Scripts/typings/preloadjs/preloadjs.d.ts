@@ -50,82 +50,71 @@ declare module createjs {
         toString(): string;
     }
 
-    export class AbstractMediaLoader
-        {
+    export class AbstractMediaLoader {
         constructor(loadItem: Object, preferXHR: boolean, type: string);
-        }
+    }
 
-    export class AbstractRequest
-        {
+    export class AbstractRequest {
         constructor(item: LoadItem);
 
         cancel(): void;
         destroy(): void;
         load(): void;
-        }
+    }
 
-    export class BinaryLoader
-        {
+    export class BinaryLoader {
         constructor(loadItem: Object);
 
         // methods
         static canLoadItem(item: Object): boolean;
-        }
+    }
 
-    export class CSSLoader
-        {
+    export class CSSLoader {
         constructor(loadItem: Object, preferXHR: boolean);
 
         // methods
         canLoadItem(item: Object): boolean;
-        }
+    }
 
-    export module DataUtils
-        {
+    export module DataUtils {
         export function parseJSON(value: string): Object;
         export function parseXML(text: string, type: string): XMLDocument;
-        }
+    }
 
-    export class ErrorEvent
-        {
+    export class ErrorEvent {
         constructor(title?: string, message?: string, data?: Object);
 
         // properties
         data: Object;
         message: string;
         title: string;
-        }
+    }
 
-    export class ImageLoader
-        {
+    export class ImageLoader {
         constructor(loadItem: Object, preferXHR: boolean);
 
         static canLoadItem(item: Object): boolean;
-        }
+    }
 
-    export class JavaScriptLoader
-        {
+    export class JavaScriptLoader {
         constructor(loadItem: Object, preferXHR: boolean);
 
         static canLoadItem(item: Object): boolean;
-        }
+    }
 
-    export class JSONLoader
-        {
+    export class JSONLoader {
         constructor(loadItem: Object);
 
         static canLoadItem(item: Object): boolean;
-        }
+    }
 
-    export class JSONPLoader
-        {
+    export class JSONPLoader {
         constructor(loadItem: Object);
 
         static canLoadItem(item: Object): boolean;
-        }
+    }
 
-    export class LoadItem
-        {
+    export class LoadItem {
         // properties
         callback: string;
         crossOrigin: boolean;
@@ -144,10 +133,9 @@ declare module createjs {
         // methods
         static create(value: LoadItem | string | Object): Object | LoadItem;
         set(props: Object): LoadItem;
-        }
-    
-    export class LoadQueue extends AbstractLoader
-        {
+    }
+
+    export class LoadQueue extends AbstractLoader {
         constructor(preferXHR?: boolean, basePath?: string, crossOrigin?: string | boolean);
 
         // properties
@@ -175,27 +163,23 @@ declare module createjs {
         unregisterLoader(loader: AbstractLoader): void;
     }
 
-    export class ManifestLoader
-        {
+    export class ManifestLoader {
         constructor(loadItem: LoadItem | Object);
 
         // methods
         static canLoadItem(item: LoadItem | Object): boolean;
-        }
+    }
 
-    export class MediaTagRequest
-        {
+    export class MediaTagRequest {
         constructor(loadItem: LoadItem, tag: HTMLAudioElement | HTMLVideoElement, srcAttribute: string);
-        }
+    }
 
-    export class PreloadJS
-        {
+    export class PreloadJS {
         static buildDate: string;
         static version: string;
-        }
+    }
 
-    export class ProgressEvent
-        {
+    export class ProgressEvent {
         constructor(loaded: number, total?: number);
 
         // properties
@@ -205,10 +189,9 @@ declare module createjs {
 
         // methods
         clone(): ProgressEvent;
-        }
+    }
 
-    export class RequestUtils
-        {
+    export class RequestUtils {
         // properties
         static ABSOLUTE_PATH: RegExp;
         static EXTENSION_PATT: RegExp;
@@ -226,61 +209,53 @@ declare module createjs {
         static isText(type: string): boolean;
         static isVideoTag(item: Object): boolean;
         static parseURI(path: string): Object;
-        }
+    }
 
-    export class SoundLoader
-        {
+    export class SoundLoader {
         constructor(loadItem: Object, preferXHR: boolean);
 
         static canLoadItem(item: Object): boolean;
-        }
+    }
 
-    export class SpriteSheetLoader
-        {
+    export class SpriteSheetLoader {
         constructor(loadItem: Object);
 
         static canLoadItem(item: Object): boolean;
-        }
+    }
 
-    export class SVGLoader
-        {
+    export class SVGLoader {
         constructor(loadItem: Object, preferXHR: boolean);
 
         static canLoadItem(item: Object): boolean;
-        }
+    }
 
-    export class TagRequest
-        {
+    export class TagRequest {
 
-        }
+    }
 
-    export class TextLoader
-        {
+    export class TextLoader {
         constructor(loadItem: Object);
 
         static canLoadItem(item: Object): boolean;
-        }
+    }
 
-    export class VideoLoader
-        {
+    export class VideoLoader {
         constructor(loadItem: Object, preferXHR: boolean);
 
         static canLoadItem(item: Object): boolean;
-        }
+    }
 
-    export class XHRRequest extends AbstractLoader
-        {
+    export class XHRRequest extends AbstractLoader {
         constructor(item: Object);
 
         // methods
         getAllResponseHeaders(): string;
         getResponseHeader(header: string): string;
-        }
+    }
 
-    export class XMLLoader
-        {
+    export class XMLLoader {
         constructor(loadItem: Object);
 
         static canLoadItem(item: Object): boolean;
-        }
+    }
 }

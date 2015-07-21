@@ -17,8 +17,7 @@
 
 declare module createjs {
 
-    export class AbstractPlugin
-        {
+    export class AbstractPlugin {
         // methods
         create(src: string, startTime: number, duration: number): AbstractSoundInstance;
         getVolume(): number;
@@ -31,10 +30,9 @@ declare module createjs {
         removeSound(src: string): void;
         setMute(value: boolean): boolean;
         setVolume(value: number): boolean;
-        }
+    }
 
-    export class AbstractSoundInstance extends EventDispatcher
-        {
+    export class AbstractSoundInstance extends EventDispatcher {
         constructor(src: string, startTime: number, duration: number, playbackResource: Object);
 
         // properties
@@ -68,19 +66,17 @@ declare module createjs {
         setPosition(value: number): AbstractSoundInstance;
         setVolume(value: number): AbstractSoundInstance;
         stop(): AbstractSoundInstance;
-        }
+    }
 
-    export class FlashAudioLoader extends AbstractLoader
-        {
+    export class FlashAudioLoader extends AbstractLoader {
         // properties
         flashId: string;
 
         // methods
         setFlash(flash: Object): void;
-        }
+    }
 
-    export class FlashAudioPlugin extends AbstractPlugin
-        {
+    export class FlashAudioPlugin extends AbstractPlugin {
         // properties
         flashReady: boolean;
         showOutput: boolean;
@@ -88,12 +84,11 @@ declare module createjs {
 
         // methods
         static isSupported(): boolean;
-        }
+    }
 
-    export class FlashAudioSoundInstance extends AbstractSoundInstance
-        {
+    export class FlashAudioSoundInstance extends AbstractSoundInstance {
         constructor(src: string, startTime: number, duration: number, playbackResource: Object);
-        }
+    }
 
     /**
      * @deprecated - use FlashAudioPlugin
@@ -115,14 +110,13 @@ declare module createjs {
         static isSupported(): boolean;
         preload(src: string, instance: Object): void;
         register(src: string, instances: number): Object;
-        removeAllSounds (): void;
+        removeAllSounds(): void;
         removeSound(src: string): void;
         setMute(value: boolean): boolean;
         setVolume(value: number): boolean;
     }
-    
-    export class HTMLAudioPlugin extends AbstractPlugin
-        {
+
+    export class HTMLAudioPlugin extends AbstractPlugin {
         constructor();
         
         // properties
@@ -132,20 +126,17 @@ declare module createjs {
         
         // methods
         static isSupported(): boolean;
-        }
+    }
 
-    export class HTMLAudioSoundInstance extends AbstractSoundInstance
-        {
+    export class HTMLAudioSoundInstance extends AbstractSoundInstance {
         constructor(src: string, startTime: number, duration: number, playbackResource: Object);
-        }
+    }
 
-    export class HTMLAudioTagPool
-        {
+    export class HTMLAudioTagPool {
 
-        }
-    
-    export class Sound extends EventDispatcher
-        {
+    }
+
+    export class Sound extends EventDispatcher {
         // properties
         static activePlugin: Object;
         static alternateExtensions: any[];
@@ -215,13 +206,11 @@ declare module createjs {
         static version: string;
     }
 
-    export class WebAudioLoader
-        {
+    export class WebAudioLoader {
         static context: AudioContext;
-        }
+    }
 
-    export class WebAudioPlugin extends AbstractPlugin
-        {
+    export class WebAudioPlugin extends AbstractPlugin {
         constructor();
         
         // properties
@@ -233,10 +222,9 @@ declare module createjs {
         // methods
         static isSupported(): boolean;
         static playEmptySound(): void;
-        }
+    }
 
-    export class WebAudioSoundInstance extends AbstractSoundInstance
-        {
+    export class WebAudioSoundInstance extends AbstractSoundInstance {
         constructor(src: string, startTime: number, duration: number, playbackResource: Object);
 
         // properties
@@ -245,5 +233,5 @@ declare module createjs {
         gainNode: GainNode;
         panNode: PannerNode;
         sourceNode: AudioNode;
-        }
+    }
 }

@@ -59,8 +59,11 @@
     <Reference Include="System.EnterpriseServices" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="assets\images\background.png" />
+    <Content Include="assets\audio\JackpotSound.wav" />
+    <Content Include="assets\audio\winSound.wav" />
+    <Content Include="assets\images\casino_background.jpg" />
     <Content Include="assets\images\disableSpinButton.png" />
+    <Content Include="assets\images\jackpot slot.png" />
     <Content Include="assets\images\logo.PNG" />
     <Content Include="assets\images\melon slot.png" />
     <Content Include="assets\images\power.png" />
@@ -88,6 +91,7 @@
     <Content Include="Scripts\lib\easeljs-0.8.0.min.js" />
     <Content Include="Scripts\lib\preloadjs-0.6.0.min.js" />
     <Content Include="Scripts\lib\soundjs-0.6.0.min.js" />
+    <Content Include="Scripts\lib\Stats.js" />
     <Content Include="Scripts\lib\tweenjs-0.6.0.min.js" />
     <Content Include="Web.config" />
   </ItemGroup>
@@ -98,10 +102,13 @@
   <ItemGroup>
     <TypeScriptCompile Include="Scripts\game.ts" />
     <TypeScriptCompile Include="Scripts\objects\button.ts" />
+    <TypeScriptCompile Include="Scripts\objects\label.ts" />
+    <TypeScriptCompile Include="Scripts\objects\reel.ts" />
     <TypeScriptCompile Include="Scripts\typings\createjs-lib\createjs-lib.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\easeljs\easeljs.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\preloadjs\preloadjs.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\soundjs\soundjs.d.ts" />
+    <TypeScriptCompile Include="Scripts\typings\stats\stats.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\tweenjs\tweenjs.d.ts" />
   </ItemGroup>
   <PropertyGroup>
